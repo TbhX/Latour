@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Building2, Info } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, PanInfo } from 'framer-motion';
 import Floor from './components/Floor';
 import Elevator from './components/Elevator';
 import FloorInfo from './components/FloorInfo';
@@ -11,9 +11,21 @@ function App() {
   const [currentFloor, setCurrentFloor] = useState(100);
   const [isElevatorOpen, setIsElevatorOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Configuration du swipe
+  const SWIPE_THRESHOLD = 50;
+  const SWIPE_VELOCITY_THRESHOLD = 500;
+  const y = useMotionValue(0);
+  const opacity = useTransform(
+    y,
+    [-window.innerHeight/2, 0, window.innerHeight/2],
+    [0.3, 1, 0.3]
+  );
 
   useEffect(() => {
     const handleScroll = (e: WheelEvent) => {
+      if (isDragging) return;
       e.preventDefault();
       if (e.deltaY < 0 && currentFloor < 100) {
         setCurrentFloor(prev => Math.min(prev + 1, 100));
@@ -24,7 +36,28 @@ function App() {
 
     window.addEventListener('wheel', handleScroll, { passive: false });
     return () => window.removeEventListener('wheel', handleScroll);
-  }, [currentFloor]);
+  }, [currentFloor, isDragging]);
+
+  const handleDragStart = () => {
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setIsDragging(false);
+    const yOffset = info.offset.y;
+    const velocity = info.velocity.y;
+
+    if (Math.abs(yOffset) > SWIPE_THRESHOLD || Math.abs(velocity) > SWIPE_VELOCITY_THRESHOLD) {
+      if (yOffset > 0 && currentFloor > 1) {
+        setCurrentFloor(prev => Math.max(prev - 1, 1));
+      } else if (yOffset < 0 && currentFloor < 100) {
+        setCurrentFloor(prev => Math.min(prev + 1, 100));
+      }
+    }
+
+    // Reset position
+    y.set(0);
+  };
 
   const currentFloorData = floors.find(f => f.level === currentFloor)!;
 
@@ -86,21 +119,44 @@ function App() {
         <span>Floor Info</span>
       </motion.button>
 
-      {/* Main Content */}
-      <div
-        className="h-full w-full transition-transform duration-1000"
-        style={{
-          transform: `translateY(${(100 - currentFloor) * 100}vh)`,
-        }}
+      {/* Main Content with Swipe */}
+      <motion.div
+        className="h-full w-full touch-none"
+        style={{ y }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.4}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
       >
-        {floors.map((floor) => (
-          <Floor
-            key={floor.level}
-            floor={floor}
-            isActive={currentFloor === floor.level}
-          />
-        ))}
-      </div>
+        <motion.div
+          className="h-full w-full transition-transform duration-1000"
+          style={{
+            transform: `translateY(${(100 - currentFloor) * 100}vh)`,
+            opacity
+          }}
+        >
+          {floors.map((floor) => (
+            <Floor
+              key={floor.level}
+              floor={floor}
+              isActive={currentFloor === floor.level}
+            />
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Swipe Indicator */}
+      <motion.div 
+        className="fixed inset-x-0 bottom-20 z-50 flex justify-center pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isDragging ? 1 : 0 }}
+      >
+        <div className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm">
+          {currentFloor < 100 && "⬆️ Glissez vers le haut"}
+          {currentFloor > 1 && "⬇️ Glissez vers le bas"}
+        </div>
+      </motion.div>
 
       {/* Modals */}
       <AnimatePresence>
