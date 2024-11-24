@@ -34,36 +34,41 @@ const themes = [
   },
 ];
 
-// Example of a floor with custom media elements
-const exampleMediaElements: MediaElement[] = [
+// Exemple d'éléments médias personnalisés pour un étage
+const centeredMediaElements: MediaElement[] = [
   {
     type: 'heading',
-    content: 'Welcome to TechCorp Global',
-    position: { x: 10, y: 20 },
-    size: { width: 80, height: 10 },
-    style: { fontSize: '3rem', fontWeight: 'bold' },
+    content: 'Welcome to the Ultimate Experience',
+    position: { x: 50, y: 30 },
+    size: { width: 80, height: 15 },
+    style: { 
+      fontSize: '4rem', 
+      fontWeight: 'bold', 
+      textAlign: 'center', 
+      transform: 'translate(-50%, -50%)', 
+      position: 'absolute', 
+      top: '50%', 
+      left: '50%' 
+    },
   },
   {
     type: 'text',
-    content: 'Innovating the future of technology',
-    position: { x: 10, y: 35 },
+    content: 'Discover digital luxury like never before.',
+    position: { x: 50, y: 50 },
     size: { width: 60, height: 10 },
-    style: { fontSize: '1.5rem', opacity: 0.8 },
-  },
-  {
-    type: 'video',
-    content: 'https://example.com/tech-demo.mp4',
-    position: { x: 60, y: 20 },
-    size: { width: 35, height: 40 },
-  },
-  {
-    type: 'button',
-    content: 'Learn More',
-    position: { x: 10, y: 60 },
-    size: { width: 20, height: 10 },
+    style: { 
+      fontSize: '1.5rem', 
+      opacity: 0.8, 
+      textAlign: 'center', 
+      transform: 'translate(-50%, -50%)', 
+      position: 'absolute', 
+      top: '60%', 
+      left: '50%' 
+    },
   },
 ];
 
+// Générer les données des étages
 export const floors: FloorData[] = [
   {
     level: 100,
@@ -73,29 +78,14 @@ export const floors: FloorData[] = [
     imageUrl: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80",
     theme: "from-indigo-900 to-purple-900",
     baseVisitors: 2000,
-    mediaElements: [
-      {
-        type: 'heading',
-        content: 'LA TOUR',
-        position: { x: 50, y: 30 },
-        size: { width: 80, height: 15 },
-        style: { fontSize: '5rem', fontWeight: 'bold', textAlign: 'center' },
-      },
-      {
-        type: 'text',
-        content: 'The World\'s First Digital Luxury Hotel',
-        position: { x: 50, y: 50 },
-        size: { width: 60, height: 10 },
-        style: { fontSize: '1.5rem', opacity: 0.8, textAlign: 'center' },
-      },
-    ],
+    mediaElements: centeredMediaElements,
   },
   ...Array.from({ length: 99 }, (_, i) => {
     const level = 99 - i;
     const baseVisitors = Math.floor(Math.random() * 1000) + 500;
     const themeIndex = Math.floor(Math.random() * themes.length);
     const isAvailable = Math.random() > 0.3;
-    
+
     return {
       level,
       isAvailable,
@@ -103,11 +93,15 @@ export const floors: FloorData[] = [
       price: generateFloorPrice(level, baseVisitors),
       imageUrl: isAvailable ? themes[themeIndex].image : undefined,
       theme: themes[themeIndex].style,
-      title: isAvailable ? `${themes[themeIndex].name} ${level}` : `Occupied Space ${level}`,
+      title: isAvailable 
+        ? `${themes[themeIndex].name} ${level}` 
+        : `Occupied Space ${level}`,
       description: isAvailable 
         ? "Experience luxury digital real estate at its finest. Perfect for brand showcases, digital exhibitions, and immersive marketing."
         : "This premium digital space is currently hosting an exclusive brand experience.",
-      mediaElements: !isAvailable && level === 98 ? exampleMediaElements : undefined,
+      mediaElements: isAvailable 
+        ? centeredMediaElements 
+        : undefined,
     };
   }),
 ];
