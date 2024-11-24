@@ -119,32 +119,34 @@ function App() {
         <span>Floor Info</span>
       </motion.button>
 
-      {/* Main Content with Swipe */}
-      <motion.div
-        className="h-full w-full touch-none"
-        style={{ y }}
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.4}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <motion.div
-          className="h-full w-full transition-transform duration-1000"
-          style={{
-            transform: `translateY(${(100 - currentFloor) * 100}vh)`,
-            opacity
-          }}
-        >
-          {floors.map((floor) => (
-            <Floor
-              key={floor.level}
-              floor={floor}
-              isActive={currentFloor === floor.level}
-            />
-          ))}
-        </motion.div>
-      </motion.div>
+      {/* Main Content */}
+<motion.div
+  className="h-full w-full touch-none"
+  style={{ y }}
+  drag="y"
+  dragConstraints={{ top: 0, bottom: 0 }}
+  dragElastic={0.4}
+  onDragStart={handleDragStart}
+  onDragEnd={handleDragEnd}
+>
+  <motion.div
+    className="h-full w-full transition-transform duration-1000"
+    style={{
+      transform: `translateY(${(100 - currentFloor) * 100}vh)`,
+      opacity
+    }}
+  >
+    {floors.map((floor) => (
+      <Floor
+        key={floor.level}
+        floor={floor}
+        isActive={currentFloor === floor.level}
+        onOpenInfo={() => setIsInfoOpen(true)}
+      />
+    ))}
+  </motion.div>
+</motion.div>
+
 
       {/* Swipe Indicator */}
       <motion.div 
