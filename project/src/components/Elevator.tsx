@@ -1,26 +1,8 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, Users, TrendingUp, CalendarCheck, Info, Building2 } from 'react-feather'; 
+import { motion } from 'framer-motion';
 
-interface ElevatorProps {
-  isOpen: boolean;
-  onClose: () => void;
-  currentFloor: number;
-  onFloorSelect: (floor: number) => void;
-}
-
-export default function Elevator({
-  isOpen,
-  onClose,
-  currentFloor,
-  onFloorSelect,
-}: ElevatorProps) {
-  if (!isOpen) return null;
-
-  const floorGroups = Array.from({ length: 10 }, (_, i) => {
-    const start = 91 - i * 10;
-    return Array.from({ length: 10 }, (_, j) => start + j);
-  });
-
+function Elevator({ onClose, onFloorSelect, floorGroups, currentFloor }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-gray-900 p-6 shadow-xl">
@@ -31,11 +13,11 @@ export default function Elevator({
           <X className="h-6 w-6" />
         </button>
 
-        <h2 className="mb-6 text-2xl font-bold">Select Floor</h2>
+        <h2 className="mb-6 text-2xl font-bold text-center">Select Floor</h2>
 
         <div className="grid gap-4">
           {floorGroups.map((group, groupIndex) => (
-            <div key={groupIndex} className="grid grid-cols-5 gap-2">
+            <div key={groupIndex} className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {group.map(floor => (
                 <button
                   key={floor}
@@ -60,3 +42,5 @@ export default function Elevator({
     </div>
   );
 }
+
+export default Elevator;
