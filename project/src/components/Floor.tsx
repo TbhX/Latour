@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, Users, TrendingUp } from 'lucide-react';
+import { Building2, Users, TrendingUp, Info, CalendarCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { FloorData } from '../types';
 import FloorContent from './FloorContent';
@@ -7,9 +7,10 @@ import FloorContent from './FloorContent';
 interface FloorProps {
   floor: FloorData;
   isActive: boolean;
+  onOpenInfo?: () => void;
 }
 
-export default function Floor({ floor, isActive }: FloorProps) {
+export default function Floor({ floor, isActive, onOpenInfo }: FloorProps) {
   const generateFloorPrice = (level: number, baseVisitors: number) => {
     const basePrice = 300;
     const visitorMultiplier = Math.floor(baseVisitors / 100);
@@ -18,41 +19,44 @@ export default function Floor({ floor, isActive }: FloorProps) {
 
   const dailyPrice = generateFloorPrice(floor.level, floor.baseVisitors);
 
-  // Example media elements for demonstration
   const defaultElements = floor.mediaElements || [
     {
       type: 'heading',
       content: floor.title || `Floor ${floor.level}`,
-      position: { x: 50, y: 30 },
-      size: { width: 60, height: 10 },
+      position: { x: 50, y: 20 },
+      size: { width: 80, height: 10 },
       style: { textAlign: 'center' },
     },
     {
       type: 'text',
       content: floor.description || '',
-      position: { x: 50, y: 45 },
-      size: { width: 60, height: 20 },
+      position: { x: 50, y: 35 },
+      size: { width: 80, height: 20 },
       style: { textAlign: 'center', fontSize: '1.125rem', opacity: 0.8 },
     },
   ];
 
   return (
-    <div className={`relative h-screen w-full bg-gradient-to-br ${floor.theme || 'from-gray-900 to-black'}`}>
-      {floor.imageUrl ? (
-        <div className="absolute inset-0">
-          <img
-            src={floor.imageUrl}
-            alt={`Floor ${floor.level}`}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-        </div>
-      ) : (
-        <div className="flex h-full w-full items-center justify-center">
-          <Building2 className="h-24 w-24 opacity-20" />
-        </div>
-      )}
+    <div className="relative h-screen w-full">
+      {/* Background */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${floor.theme || 'from-gray-900 to-black'}`}>
+        {floor.imageUrl ? (
+          <>
+            <img
+              src={floor.imageUrl}
+              alt={`Floor ${floor.level}`}
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Building2 className="h-24 w-24 opacity-20" />
+          </div>
+        )}
+      </div>
 
+      {/* Content */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: isActive ? 1 : 0 }}
@@ -60,37 +64,64 @@ export default function Floor({ floor, isActive }: FloorProps) {
       >
         {floor.isAvailable ? (
           <div className="relative h-full">
-            <FloorContent elements={defaultElements} />
-            
-            <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 transform items-center gap-8">
-              <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-                <div className="flex items-center gap-2 text-blue-300">
-                  <Users className="h-5 w-5" />
-                  <span>Daily Visitors</span>
+            {/* Main Content */}
+            <div className="mx-auto max-w-6xl px-4 pt-20 sm:px-6 lg:px-8">
+              <FloorContent elements={defaultElements} />
+            </div>
+
+            {/* Bottom Section */}
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 backdrop-blur-sm sm:p-6">
+              <div className="mx-auto max-w-6xl">
+                {/* Stats Grid */}
+                <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">
+                  <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-blue-300">
+                      <Users className="h-5 w-5" />
+                      <span>Daily Visitors</span>
+                    </div>
+                    <p className="mt-2 text-2xl font-bold">{floor.baseVisitors}+</p>
+                  </div>
+                  <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-green-300">
+                      <TrendingUp className="h-5 w-5" />
+                      <span>Daily Rate</span>
+                    </div>
+                    <p className="mt-2 text-2xl font-bold">${dailyPrice}</p>
+                  </div>
+                  <div className="col-span-2 md:col-span-1 rounded-xl bg-white/10 p-4 backdrop-blur-sm">
+                    <div className="flex items-center gap-2 text-purple-300">
+                      <CalendarCheck className="h-5 w-5" />
+                      <span>Availability</span>
+                    </div>
+                    <p className="mt-2 text-2xl font-bold">Immediate</p>
+                  </div>
                 </div>
-                <p className="mt-2 text-2xl font-bold">{floor.baseVisitors}+</p>
-              </div>
-              <div className="rounded-xl bg-white/10 p-4 backdrop-blur-sm">
-                <div className="flex items-center gap-2 text-green-300">
-                  <TrendingUp className="h-5 w-5" />
-                  <span>Daily Rate</span>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex-1 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 text-lg font-semibold shadow-lg transition sm:max-w-xs"
+                  >
+                    Réserver maintenant
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={onOpenInfo}
+                    className="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-6 py-4 text-lg font-semibold backdrop-blur-sm transition hover:bg-white/20"
+                  >
+                    <Info className="h-5 w-5" />
+                    Voir les détails
+                  </motion.button>
                 </div>
-                <p className="mt-2 text-2xl font-bold">${dailyPrice}</p>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="group relative overflow-hidden rounded-full bg-white px-8 py-3 text-lg font-semibold text-gray-900"
-              >
-                <span className="relative z-10">Reserve This Floor</span>
-                <div className="absolute inset-0 -z-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 transition-opacity group-hover:opacity-100" />
-              </motion.button>
             </div>
           </div>
         ) : (
-          <FloorContent 
-            elements={floor.mediaElements || defaultElements} 
-          />
+          <FloorContent elements={floor.mediaElements || defaultElements} />
         )}
       </motion.div>
     </div>
