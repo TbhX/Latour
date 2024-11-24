@@ -1,3 +1,41 @@
+/* Add this CSS to your global styles or in the corresponding stylesheet for the app */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    background-color: #000;
+    color: #fff;
+  }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 640px) {
+  /* Mobile devices */
+  .mobile-responsive {
+    padding: 2rem;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  /* Tablets */
+  .tablet-responsive {
+    padding: 3rem;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Desktop devices */
+  .desktop-responsive {
+    padding: 4rem;
+    font-size: 18px;
+  }
+}
