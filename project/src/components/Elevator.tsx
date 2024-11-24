@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Users, TrendingUp, CalendarCheck, Info, Building2 } from 'react-feather'; 
+// import { X, Users, TrendingUp, CalendarCheck, Info, Building2 } from 'react-feather'; 
 import { motion } from 'framer-motion';
 
 function Elevator({ onClose, onFloorSelect, floorGroups, currentFloor }) {
