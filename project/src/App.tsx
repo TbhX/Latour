@@ -13,8 +13,12 @@ function App() {
 
   const currentFloorData = floors.find((f) => f.level === currentFloor)!;
 
+  const handleFloorChange = (newFloor: number) => {
+    setCurrentFloor(newFloor);
+  };
+
   return (
-    <div className="h-screen w-screen overflow-hidden bg-gradient-to-b from-blue-900 to-black text-white">
+    <div className="h-screen w-screen overflow-hidden bg-gradient-to-b from-blue-900 to-black text-white relative">
       {/* Scène de la tour */}
       <TowerScene currentFloor={currentFloor} />
 
@@ -45,14 +49,14 @@ function App() {
       <FloorScrollbar
         floors={floors.map((f) => f.level)} // Liste des étages
         currentFloor={currentFloor}
-        onFloorSelect={(floor) => setCurrentFloor(floor)}
+        onFloorSelect={handleFloorChange}
       />
 
       {/* Contenu principal des étages */}
       <motion.div
         className="h-full w-full transition-transform duration-1000"
         style={{
-          transform: `translateY(${(100 - currentFloor) * 100}vh)`,
+          transform: `translateY(-${(currentFloor - 1) * 100}vh)`,
         }}
       >
         {floors.map((floor) => (
