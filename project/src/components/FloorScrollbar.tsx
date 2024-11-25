@@ -15,21 +15,23 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   const handleScroll = (event: React.WheelEvent) => {
     event.preventDefault();
     
-    const currentIndex = floors.indexOf(currentFloor);
-    let nextIndex;
-
+    // Get current floor index
+    const sortedFloors = [...floors].sort((a, b) => b - a); // Sort floors in descending order
+    const currentIndex = sortedFloors.indexOf(currentFloor);
+    
     if (event.deltaY > 0) {
-      // Scrolling down
-      nextIndex = Math.min(currentIndex + 1, floors.length - 1);
+      // Scrolling down - go to lower floor
+      if (currentIndex < sortedFloors.length - 1) {
+        onFloorSelect(sortedFloors[currentIndex + 1]);
+      }
     } else {
-      // Scrolling up
-      nextIndex = Math.max(currentIndex - 1, 0);
+      // Scrolling up - go to higher floor
+      if (currentIndex > 0) {
+        onFloorSelect(sortedFloors[currentIndex - 1]);
+      }
     }
-
-    onFloorSelect(floors[nextIndex]);
   };
 
-  // Add global wheel event listener
   useEffect(() => {
     const handleWheelEvent = (event: WheelEvent) => {
       event.preventDefault();
@@ -40,20 +42,15 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
     return () => window.removeEventListener("wheel", handleWheelEvent);
   }, [currentFloor, floors]);
 
-  // Handle floor button click
-  const handleFloorClick = (floor: number) => {
-    onFloorSelect(floor);
-  };
-
   return (
     <div
       className="fixed right-0 top-0 bottom-0 flex flex-col justify-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm z-50"
       onWheel={handleScroll}
     >
-      {floors.map((floor) => (
+      {[...floors].sort((a, b) => b - a).map((floor) => (
         <button
           key={floor}
-          onClick={() => handleFloorClick(floor)}
+          onClick={() => onFloorSelect(floor)}
           className={`
             w-12 h-12 
             rounded-full 
