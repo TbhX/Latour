@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 type FloorScrollbarProps = {
   floors: number[];
@@ -11,50 +11,63 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   currentFloor,
   onFloorSelect,
 }) => {
-  const [scrollPosition, setScrollPosition] = useState(0);
-
-  // Utiliser la position de la molette pour ajuster l'étage
+  // Handle mouse wheel scrolling
   const handleScroll = (event: React.WheelEvent) => {
-    // Si la molette est utilisée vers le bas (défilement vers le bas)
+    event.preventDefault();
+    
+    const currentIndex = floors.indexOf(currentFloor);
+    let nextIndex;
+
     if (event.deltaY > 0) {
-      const nextFloor = Math.min(currentFloor + 1, floors.length);
-      onFloorSelect(nextFloor);
-    } else if (event.deltaY < 0) {
-      const prevFloor = Math.max(currentFloor - 1, 1);
-      onFloorSelect(prevFloor);
+      // Scrolling down
+      nextIndex = Math.min(currentIndex + 1, floors.length - 1);
+    } else {
+      // Scrolling up
+      nextIndex = Math.max(currentIndex - 1, 0);
     }
+
+    onFloorSelect(floors[nextIndex]);
   };
 
+  // Add global wheel event listener
   useEffect(() => {
-    // Écouter les événements de la molette
-    const onWheel = (event: WheelEvent) => {
+    const handleWheelEvent = (event: WheelEvent) => {
+      event.preventDefault();
       handleScroll(event as any);
     };
 
-    // Ajouter l'événement de molette
-    window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("wheel", handleWheelEvent, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheelEvent);
+  }, [currentFloor, floors]);
 
-    // Nettoyer l'événement lors du démontage
-    return () => {
-      window.removeEventListener("wheel", onWheel);
-    };
-  }, [currentFloor]);
+  // Handle floor button click
+  const handleFloorClick = (floor: number) => {
+    onFloorSelect(floor);
+  };
 
   return (
     <div
-      className="fixed right-0 top-0 bottom-0 flex flex-col gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm z-50 cursor-pointer"
-      style={{ height: "100vh" }}
+      className="fixed right-0 top-0 bottom-0 flex flex-col justify-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm z-50"
       onWheel={handleScroll}
     >
       {floors.map((floor) => (
-        <div
+        <button
           key={floor}
-          className={`p-2 rounded-full cursor-pointer transition-colors ${
-            currentFloor === floor ? "bg-white text-black" : "bg-gray-500 text-white"
-          }`}
+          onClick={() => handleFloorClick(floor)}
+          className={`
+            w-12 h-12 
+            rounded-full 
+            flex items-center justify-center
+            transition-all duration-300
+            ${
+              currentFloor === floor 
+                ? "bg-white text-black scale-110" 
+                : "bg-gray-500/50 text-white hover:bg-gray-400/50"
+            }
+          `}
         >
           {floor}
-        </div>
+        </button>
       ))}
     </div>
   );
