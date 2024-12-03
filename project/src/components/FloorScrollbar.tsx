@@ -11,21 +11,20 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   currentFloor,
   onFloorSelect,
 }) => {
-  const reversedFloors = [...floors].reverse(); // Inverser les étages
-  const [visibleFloors, setVisibleFloors] = useState(reversedFloors.slice(0, 10));
+  const [visibleFloors, setVisibleFloors] = useState(floors.slice(0, 10));
   const [scrollPosition, setScrollPosition] = useState(0);
   const floorsPerView = 10;
 
-  // Mettre à jour les étages visibles en fonction de la position de défilement
+  // Update visible floors based on scroll position
   useEffect(() => {
     const start = scrollPosition;
     const end = start + floorsPerView;
-    setVisibleFloors(reversedFloors.slice(start, end));
-  }, [scrollPosition, reversedFloors]);
+    setVisibleFloors(floors.slice(start, end));
+  }, [scrollPosition, floors]);
 
   const handleScroll = (event: React.WheelEvent) => {
     event.preventDefault();
-    if (event.deltaY > 0 && scrollPosition < reversedFloors.length - floorsPerView) {
+    if (event.deltaY > 0 && scrollPosition < floors.length - floorsPerView) {
       setScrollPosition((prev) => prev + 1);
     } else if (event.deltaY < 0 && scrollPosition > 0) {
       setScrollPosition((prev) => prev - 1);
@@ -36,15 +35,12 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
     const screenHeight = window.innerHeight;
     const mouseY = event.clientY;
 
-    // Si la souris est proche du haut de l'écran, faites défiler vers le haut
+    // If mouse is near the top of the screen, scroll up
     if (mouseY < 50 && scrollPosition > 0) {
       setScrollPosition((prev) => prev - 1);
     }
-    // Si la souris est proche du bas de l'écran, faites défiler vers le bas
-    if (
-      mouseY > screenHeight - 50 &&
-      scrollPosition < reversedFloors.length - floorsPerView
-    ) {
+    // If mouse is near the bottom of the screen, scroll down
+    if (mouseY > screenHeight - 50 && scrollPosition < floors.length - floorsPerView) {
       setScrollPosition((prev) => prev + 1);
     }
   };
@@ -52,7 +48,7 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [scrollPosition, reversedFloors]);
+  }, [scrollPosition, floors]);
 
   return (
     <div
@@ -63,11 +59,11 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
         <button
           key={floor}
           onClick={() => onFloorSelect(floor)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+          className={w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
             currentFloor === floor
               ? "bg-white text-black scale-110"
               : "bg-gray-500/50 text-white hover:bg-gray-400/50"
-          }`}
+          }}
         >
           {floor}
         </button>
@@ -76,4 +72,4 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   );
 };
 
-export default FloorScrollbar;
+export default FloorScrollbar
