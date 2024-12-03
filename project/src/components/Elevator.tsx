@@ -16,19 +16,19 @@ export default function Elevator({
 }: ElevatorProps) {
   if (!isOpen) return null;
 
-  // Générer les groupes d'étages inversés (du bas vers le haut)
   const totalFloors = 100;
   const floorsPerGroup = 10;
 
+  // Generate floor groups in ascending order (from 1 to 100)
   const floorGroups = Array.from({ length: Math.ceil(totalFloors / floorsPerGroup) }, (_, i) => {
-    const start = i * floorsPerGroup + 1; // Premier étage du groupe
+    const start = i * floorsPerGroup + 1; // First floor in the group
     return Array.from({ length: floorsPerGroup }, (_, j) => start + j).filter(floor => floor <= totalFloors);
-  }).reverse(); // Inverser l'ordre des groupes pour afficher du haut vers le bas
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="relative max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-gray-900 p-6 shadow-xl">
-        {/* Bouton pour fermer */}
+        {/* Button to close */}
         <button
           onClick={onClose}
           className="absolute right-4 top-4 rounded-full p-2 transition hover:bg-white/10"
@@ -36,10 +36,10 @@ export default function Elevator({
           <X className="h-6 w-6" />
         </button>
 
-        {/* Titre */}
+        {/* Title */}
         <h2 className="mb-6 text-2xl font-bold text-white">Select Floor</h2>
 
-        {/* Boutons pour les étages */}
+        {/* Buttons for floors */}
         <div className="grid gap-4">
           {floorGroups.map((group, groupIndex) => (
             <div key={groupIndex} className="grid grid-cols-5 gap-2">
