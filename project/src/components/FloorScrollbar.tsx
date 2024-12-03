@@ -11,26 +11,28 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   currentFloor,
   onFloorSelect,
 }) => {
+  // L'ordre des étages doit commencer par l'étage 100 et finir par l'étage 1.
+  const reversedFloors = floors.slice().reverse(); 
   const [scrollPosition, setScrollPosition] = useState(0);
   const floorsPerView = 10;
 
-  // Update scroll position and visible floors when the floor is selected
+  // Initialisation de la scrollPosition pour que l'étage 100 soit visible dès le début.
   useEffect(() => {
-    const indexOfCurrentFloor = floors.indexOf(currentFloor);
+    const indexOfCurrentFloor = reversedFloors.indexOf(currentFloor);
     if (indexOfCurrentFloor !== -1) {
       const newScrollPosition = Math.floor(indexOfCurrentFloor / floorsPerView) * floorsPerView;
       setScrollPosition(newScrollPosition);
     }
-  }, [currentFloor, floors]);
+  }, [currentFloor, reversedFloors]);
 
-  // Update visible floors based on scroll position
-  const visibleFloors = floors.slice(scrollPosition, scrollPosition + floorsPerView);
+  // Mise à jour des étages visibles en fonction de la scrollPosition
+  const visibleFloors = reversedFloors.slice(scrollPosition, scrollPosition + floorsPerView);
 
   const handleScroll = (event: React.WheelEvent) => {
     event.preventDefault();
     const newScrollPosition = scrollPosition + (event.deltaY > 0 ? floorsPerView : -floorsPerView);
-    
-    // Clamp the scroll position to valid bounds
+
+    // Clamp la position de scroll à des valeurs valides
     if (newScrollPosition >= 0 && newScrollPosition <= floors.length - floorsPerView) {
       setScrollPosition(newScrollPosition);
     }
@@ -40,11 +42,11 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
     const screenHeight = window.innerHeight;
     const mouseY = event.clientY;
 
-    // If mouse is near the top of the screen, scroll up
+    // Si la souris est proche du haut de l'écran, défilement vers le haut
     if (mouseY < 50 && scrollPosition > 0) {
       setScrollPosition((prev) => Math.max(prev - floorsPerView, 0));
     }
-    // If mouse is near the bottom of the screen, scroll down
+    // Si la souris est proche du bas de l'écran, défilement vers le bas
     if (mouseY > screenHeight - 50 && scrollPosition < floors.length - floorsPerView) {
       setScrollPosition((prev) => Math.min(prev + floorsPerView, floors.length - floorsPerView));
     }
@@ -65,8 +67,8 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
           key={floor}
           onClick={() => {
             onFloorSelect(floor);
-            // When clicking on an individual floor, update the scroll position to center that floor
-            const indexOfFloor = floors.indexOf(floor);
+            // Quand on clique sur un étage, mettre à jour la position du scroll
+            const indexOfFloor = reversedFloors.indexOf(floor);
             const newScrollPosition = Math.floor(indexOfFloor / floorsPerView) * floorsPerView;
             setScrollPosition(newScrollPosition);
           }}
