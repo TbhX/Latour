@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Elevator from "./components/Elevator";
 import FloorInfo from "./components/FloorInfo";
-
+import FloorScrollbar from "./components/FloorScrollbar";
 import TowerScene from "./components/TowerScene";
 import { floors } from "./data/floors";
 
