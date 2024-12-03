@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 type FloorScrollbarProps = {
   floors: number[];
@@ -11,59 +11,57 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   currentFloor,
   onFloorSelect,
 }) => {
-  const [visibleFloors, setVisibleFloors] = useState(floors.slice(0, 10));
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const floorsPerView = 10;
-
-  // Update visible floors based on scroll position
-  useEffect(() => {
-    const start = scrollPosition;
-    const end = start + floorsPerView;
-    setVisibleFloors(floors.slice(start, end));
-  }, [scrollPosition, floors]);
-
+  // Handle mouse wheel scrolling
   const handleScroll = (event: React.WheelEvent) => {
     event.preventDefault();
-    if (event.deltaY > 0 && scrollPosition < floors.length - floorsPerView) {
-      setScrollPosition((prev) => prev + 1);
-    } else if (event.deltaY < 0 && scrollPosition > 0) {
-      setScrollPosition((prev) => prev - 1);
-    }
-  };
-
-  const handleMouseMove = (event: MouseEvent) => {
-    const screenHeight = window.innerHeight;
-    const mouseY = event.clientY;
-
-    // If mouse is near the top of the screen, scroll up
-    if (mouseY < 50 && scrollPosition > 0) {
-      setScrollPosition((prev) => prev - 1);
-    }
-    // If mouse is near the bottom of the screen, scroll down
-    if (mouseY > screenHeight - 50 && scrollPosition < floors.length - floorsPerView) {
-      setScrollPosition((prev) => prev + 1);
+    
+    // Get current floor index
+    const sortedFloors = [...floors].sort((a, b) => b - a); // Sort floors in descending order
+    const currentIndex = sortedFloors.indexOf(currentFloor);
+    
+    if (event.deltaY > 0) {
+      // Scrolling down - go to lower floor
+      if (currentIndex < sortedFloors.length - 1) {
+        onFloorSelect(sortedFloors[currentIndex + 1]);
+      }
+    } else {
+      // Scrolling up - go to higher floor
+      if (currentIndex > 0) {
+        onFloorSelect(sortedFloors[currentIndex - 1]);
+      }
     }
   };
 
   useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [scrollPosition, floors]);
+    const handleWheelEvent = (event: WheelEvent) => {
+      event.preventDefault();
+      handleScroll(event as any);
+    };
+
+    window.addEventListener("wheel", handleWheelEvent, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheelEvent);
+  }, [currentFloor, floors]);
 
   return (
     <div
-      className="fixed right-0 top-0 bottom-0 flex flex-col justify-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm z-50 overflow-hidden"
+      className="fixed right-0 top-0 bottom-0 flex flex-col justify-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm z-50"
       onWheel={handleScroll}
     >
-      {visibleFloors.map((floor) => (
+      {[...floors].sort((a, b) => b - a).map((floor) => (
         <button
           key={floor}
           onClick={() => onFloorSelect(floor)}
-          className={w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            currentFloor === floor
-              ? "bg-white text-black scale-110"
-              : "bg-gray-500/50 text-white hover:bg-gray-400/50"
-          }}
+          className={
+            w-12 h-12 
+            rounded-full 
+            flex items-center justify-center
+            transition-all duration-300
+            ${
+              currentFloor === floor 
+                ? "bg-white text-black scale-110" 
+                : "bg-gray-500/50 text-white hover:bg-gray-400/50"
+            }
+          }
         >
           {floor}
         </button>
@@ -72,4 +70,4 @@ const FloorScrollbar: React.FC<FloorScrollbarProps> = ({
   );
 };
 
-export default FloorScrollbar
+export default FloorScrollbar;
